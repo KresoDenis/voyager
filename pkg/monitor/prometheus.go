@@ -7,7 +7,7 @@ import (
 
 	api "github.com/appscode/voyager/apis/voyager/v1beta1"
 	prom "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
-	kext_cs "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
+	ecs "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
 	kerr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -16,13 +16,13 @@ import (
 type PrometheusController struct {
 	kubeClient kubernetes.Interface
 	promClient prom.MonitoringV1Interface
-	crdClient  kext_cs.ApiextensionsV1beta1Interface
+	extClient  ecs.ApiextensionsV1beta1Interface
 }
 
-func NewPrometheusController(kubeClient kubernetes.Interface, crdClient kext_cs.ApiextensionsV1beta1Interface, promClient prom.MonitoringV1Interface) Monitor {
+func NewPrometheusController(kubeClient kubernetes.Interface, extClient ecs.ApiextensionsV1beta1Interface, promClient prom.MonitoringV1Interface) Monitor {
 	return &PrometheusController{
 		kubeClient: kubeClient,
-		crdClient:  crdClient,
+		extClient:  extClient,
 		promClient: promClient,
 	}
 }
@@ -52,11 +52,11 @@ func (c *PrometheusController) DeleteMonitor(r *api.Ingress, spec *api.MonitorSp
 }
 
 func (c *PrometheusController) SupportsCoreOSOperator() bool {
-	_, err := c.crdClient.CustomResourceDefinitions().Get(prom.PrometheusName+"."+prom.Group, metav1.GetOptions{})
+	_, err := c.extClient.CustomResourceDefinitions().Get(prom.PrometheusName+"."+prom.Group, metav1.GetOptions{})
 	if err != nil {
 		return false
 	}
-	_, err = c.crdClient.CustomResourceDefinitions().Get(prom.ServiceMonitorName+"."+prom.Group, metav1.GetOptions{})
+	_, err = c.extClient.CustomResourceDefinitions().Get(prom.ServiceMonitorName+"."+prom.Group, metav1.GetOptions{})
 	if err != nil {
 		return false
 	}

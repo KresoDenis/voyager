@@ -5,7 +5,8 @@ import (
 )
 
 const (
-	AgentCoreosPrometheus     = "coreos-prometheus-operator"
+	AgentPrometheusDirect = "prometheus"
+	AgentCoreOSPrometheus = "coreos-prometheus-operator"
 	StatsPortName             = "stats"
 	ExporterPortName          = "http"
 	DefaultExporterPortNumber = 56790
@@ -45,8 +46,8 @@ func (r Ingress) MonitorSpec() (*MonitorSpec, error) {
 	if agent == "" {
 		return nil, nil
 	}
-	if agent != AgentCoreosPrometheus {
-		return nil, fmt.Errorf("Unknown monitoring agent %s", agent)
+	if agent != AgentCoreOSPrometheus {
+		return nil, fmt.Errorf("unknown monitoring agent %s", agent)
 	}
 
 	var err error
@@ -54,7 +55,7 @@ func (r Ingress) MonitorSpec() (*MonitorSpec, error) {
 
 	prom.Namespace = GetString(r.Annotations, ServiceMonitorNamespace)
 	if prom.Namespace == "" {
-		return nil, fmt.Errorf("Missing %s annotation", ServiceMonitorNamespace)
+		return nil, fmt.Errorf("missing %s annotation", ServiceMonitorNamespace)
 	}
 
 	prom.Labels, err = GetMap(r.Annotations, ServiceMonitorLabels)
@@ -62,7 +63,7 @@ func (r Ingress) MonitorSpec() (*MonitorSpec, error) {
 		return nil, err
 	}
 	if len(prom.Labels) <= 0 {
-		return nil, fmt.Errorf("Missing %s annotation", ServiceMonitorLabels)
+		return nil, fmt.Errorf("missing %s annotation", ServiceMonitorLabels)
 	}
 
 	port, err := GetInt(r.Annotations, ServiceMonitorPort)
