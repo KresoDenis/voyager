@@ -40,7 +40,6 @@ type SharedInfo struct {
 	MaxConnections        int
 	ForceMatchServicePort bool
 	Limit                 *Limit
-	SSLRedirect           bool
 }
 
 type StatsInfo struct {
@@ -80,6 +79,7 @@ type HTTPPath struct {
 	Host    string
 	Path    string
 	Backend Backend
+	SSLRedirect   bool
 }
 
 func (svc HTTPPath) sortKey() string {
@@ -99,6 +99,7 @@ type TCPService struct {
 	Backend       Backend
 	ALPNOptions   string
 	TLSAuth       *TLSAuth
+	SSLRedirect   bool
 }
 
 func (svc TCPService) sortKey() string {
